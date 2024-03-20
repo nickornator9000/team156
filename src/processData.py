@@ -1,6 +1,4 @@
 from pyspark.sql import SparkSession
-import sqlite3
-con = sqlite3.connect("data/FPA_FOD_20170508.sqlite")
 
 spark = SparkSession.builder\
            .config('spark.jars.packages', 'org.xerial:sqlite-jdbc:3.34.0')\
