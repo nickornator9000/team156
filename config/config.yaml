@@ -1,0 +1,9 @@
+---
+#Enter column names to be extracted
+colNames:
+- col1
+- col2
+- etc
+#some way to limit range based on datetime
+startdate: "YYYY-MM-DD HH:MM:SS"
+enddate: "YYYY-MM-DD HH:MM:SS"
