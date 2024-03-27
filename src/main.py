@@ -1,6 +1,6 @@
 #coordinate tasks
 import modelData
-#from build.scripts.configSingleton import SingletonClass
+from build.scripts.configSingleton import SingletonClass
 from pyspark.sql import SparkSession
 from pyspark.sql import SparkSession
 from processData import clean_data
