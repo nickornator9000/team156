@@ -1,6 +1,7 @@
 #coordinate tasks
 import modelData
 from build.scripts.configSingleton import SingletonClass
+from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.sql import SparkSession
 from pyspark.sql import SparkSession
 from processData import clean_data
@@ -25,7 +26,17 @@ if __name__ == "__main__":
     #do stuff
     print("Hello world")
     df = clean_data(load_data())
-    df = df.select(['LATITUDE','LONGITUDE','OWNER_CODE','FIRE_SIZE','STAT_CAUSE_CODE'])
+    df = df.orderBy("DISCOVERY_DATE_TIME",ascending=False)
+    df.show(3,vertical=True)
+    df = df.select(['LATITUDE','LONGITUDE','OWNER_CODE','FIRE_SIZE','STAT_CAUSE_CODE','DISCOVERY_DOY'])
+    df = df.limit(100_000)
     df = modelData.getFeatureVector(df)
     df = modelData.runK_Means(df,k=10)
     df.show(3)
+    evaluator = ClusteringEvaluator()
+    
+    eval = evaluator.evaluate(df)
+    
+    print(str(eval))
+    df = df.select(['LATITUDE','LONGITUDE','prediction'])
+    df.write.csv("prototype_data.csv", header=True, mode="overwrite")
