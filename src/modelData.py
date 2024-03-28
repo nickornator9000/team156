@@ -26,7 +26,7 @@ def runK_Means(cleanedData,k):
     PARAMS = k ~ number of clusters, cleanedData ~ feature vector
     Run k-means on dataset. 
     """
-    k_means = KMeans(k=k).setMaxIter(10).setSeed(1)
+    k_means = KMeans(k=k).setMaxIter(20).setSeed(420)
     k_means_model = k_means.fit(cleanedData)
     output = k_means_model.transform(cleanedData)
     return output

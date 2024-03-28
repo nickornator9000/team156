@@ -29,9 +29,9 @@ if __name__ == "__main__":
     df = df.orderBy("DISCOVERY_DATE_TIME",ascending=False)
     df.show(3,vertical=True)
     df = df.select(['LATITUDE','LONGITUDE','OWNER_CODE','FIRE_SIZE','STAT_CAUSE_CODE','DISCOVERY_DOY'])
-    df = df.limit(100_000)
+    #df = df.limit(200_000)
     df = modelData.getFeatureVector(df)
-    df = modelData.runK_Means(df,k=10)
+    df = modelData.runK_Means(df,k=20)
     df.show(3)
     evaluator = ClusteringEvaluator()
     
@@ -39,4 +39,8 @@ if __name__ == "__main__":
     
     print(str(eval))
     df = df.select(['LATITUDE','LONGITUDE','prediction'])
+    df = df.coalesce(1)
     df.write.csv("prototype_data.csv", header=True, mode="overwrite")
+    df = df.groupBy("prediction").count()
+    df.show(30)
+    
