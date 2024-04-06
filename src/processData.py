@@ -1,11 +1,14 @@
 import os
-# Set Kaggle API credentials
-os.environ['KAGGLE_USERNAME'] = 'jasongomez2542'
-os.environ['KAGGLE_KEY'] = '07a454824092d0fd560f897555a8ca13'
+import yaml
+# API credemtials must be set before importing kaggle module
+with open('config/config.yaml', 'r') as file:
+        data = yaml.safe_load(file)
+        os.environ['KAGGLE_USERNAME'] = data['username']
+        os.environ['KAGGLE_KEY'] = data['apiKey']
+        
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, udf, expr, concat_ws, to_timestamp
 from pyspark.sql.types import IntegerType, DateType
-import yaml
 import datetime
 import kaggle
 
@@ -41,7 +44,7 @@ def load_data():
            .getOrCreate()
     
     df = spark.read.format('jdbc') \
-        .options(driver='org.sqlite.JDBC', query=select_columns_query, url=f"jdbc:sqlite:{os.path.expanduser('~/Desktop/data')}/FPA_FOD_20170508.sqlite") \
+        .options(driver='org.sqlite.JDBC', query=select_columns_query, url=f"jdbc:sqlite:{os.getcwd()}/FPA_FOD_20170508.sqlite") \
         .load()
     return df
 
@@ -70,24 +73,6 @@ def clean_data(df):
     df = df.withColumn("CONT_DATE_TIME", to_timestamp(concat_ws(" ", "CONT_DATE", "CONT_TIME"), "yyyy-MM-dd HH:mm:ss"))
     return df
 
-def download_dataset():
-    #url = "https://www.kaggle.com/datasets/rtatman/188-million-us-wildfires/download?datasetVersionNumber=2"
-    # Define the dataset path on Kaggle
-    # Example: 'zillow/zecon' for Zillow Economics data
-    dataset_path = 'rtatman/188-million-us-wildfires/2'
-
-    # Define the path where you want to download the dataset
-    download_path = '~/Desktop/data'
-    
-    # Expand the user's home directory
-    download_path = os.path.expanduser(download_path)
-
-    # Make sure the download path exists
-    os.makedirs(download_path, exist_ok=True)
-
-    # Use the Kaggle API to download the dataset
-    kaggle.api.dataset_download_files(dataset_path, path=download_path, unzip=True)
-
 def filter_by_timestamp(df, start_timestamp, end_timestamp):
     filtered_df = df.filter(
         (col("DISCOVERY_DATE_TIME") >= start_timestamp) & 
@@ -102,6 +87,26 @@ def filter_by_yaml_timestamp(df):
     start_timestamp = datetime.datetime.fromisoformat(data['startdate'])
     end_timestamp = datetime.datetime.fromisoformat(data['enddate'])
     return filter_by_timestamp(df, start_timestamp, end_timestamp)
+
+def download_dataset():
+    # Define the dataset path on Kaggle
+    dataset_path = 'rtatman/188-million-us-wildfires/2'
+
+    # Define the path where you want to download the dataset
+    download_path = download_path = os.getcwd()
+    
+    # Check if a key dataset file already exists to avoid re-downloading
+    key_file_path = os.path.join(download_path, 'FPA_FOD_20170508.sqlite')
+    if os.path.exists(key_file_path):
+        print(f"Dataset already exists at {key_file_path}. Skipping download.")
+        return
+
+    # Make sure the download path exists
+    os.makedirs(download_path, exist_ok=True)
+
+    # Use the Kaggle API to download the dataset
+    kaggle.api.dataset_download_files(dataset_path, path=download_path, unzip=True)
+    print("Dataset downloaded successfully.")
 
 download_dataset()
 df = clean_data(load_data())
