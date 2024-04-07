@@ -38,7 +38,7 @@ def load_data():
            .getOrCreate()
     
     df = spark.read.format('jdbc') \
-        .options(driver='org.sqlite.JDBC', query=select_columns_query, url=f"jdbc:sqlite:data/FPA_FOD_20170508.sqlite") \
+        .options(driver='org.sqlite.JDBC', query=select_columns_query, url="jdbc:sqlite:data/FPA_FOD_20170508.sqlite") \
         .load()
     return df
 
