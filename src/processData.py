@@ -1,8 +1,10 @@
+import os
+import yaml        
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, udf, expr, concat_ws, to_timestamp
 from pyspark.sql.types import IntegerType, DateType
-import yaml
 import datetime
+import kaggle
 
 def julian_to_gregorian(jdn):
     if jdn is None:
@@ -32,11 +34,11 @@ def load_data():
     select_columns_query = f"(SELECT {', '.join(data['colNames'])} FROM Fires) AS subquery"
     
     spark = SparkSession.builder \
-           .config('spark.jars.packages', 'org.xerial:sqlite-jdbc:3.34.0')\
+           .config('spark.jars.packages', 'org.xerial:sqlite-jdbc:3.34.0') \
            .getOrCreate()
     
     df = spark.read.format('jdbc') \
-        .options(driver='org.sqlite.JDBC', query=select_columns_query, url='jdbc:sqlite:data/FPA_FOD_20170508.sqlite') \
+        .options(driver='org.sqlite.JDBC', query=select_columns_query, url="jdbc:sqlite:data/FPA_FOD_20170508.sqlite") \
         .load()
     return df
 
@@ -80,5 +82,26 @@ def filter_by_yaml_timestamp(df):
     end_timestamp = datetime.datetime.fromisoformat(data['enddate'])
     return filter_by_timestamp(df, start_timestamp, end_timestamp)
 
+def download_dataset():
+    # Define the dataset path on Kaggle
+    dataset_path = 'rtatman/188-million-us-wildfires/2'
+
+    # Define the path where you want to download the dataset
+    download_path = './data'
+    
+    # Check if a key dataset file already exists to avoid re-downloading
+    key_file_path = os.path.join(download_path, 'FPA_FOD_20170508.sqlite')
+    if os.path.exists(key_file_path):
+        print(f"Dataset already exists at {key_file_path}. Skipping download.")
+        return
+
+    # Make sure the download path exists
+    os.makedirs(download_path, exist_ok=True)
+
+    # Use the Kaggle API to download the dataset
+    kaggle.api.dataset_download_files(dataset_path, path=download_path, unzip=True)
+    print("Dataset downloaded successfully.")
+
+download_dataset()
 df = clean_data(load_data())
 df.show(n=3, vertical=True)
