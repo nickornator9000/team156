@@ -43,7 +43,3 @@ colNames:
 #some way to limit range based on datetime
 startdate: "YYYY-MM-DD HH:MM:SS"
 enddate: "YYYY-MM-DD HH:MM:SS"
-
-#Kaggle API credentials
-username: ''
-apiKey: ''

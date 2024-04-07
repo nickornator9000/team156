@@ -1,11 +1,5 @@
 import os
-import yaml
-# API credemtials must be set before importing kaggle module
-with open('config/config.yaml', 'r') as file:
-        data = yaml.safe_load(file)
-        os.environ['KAGGLE_USERNAME'] = data['username']
-        os.environ['KAGGLE_KEY'] = data['apiKey']
-        
+import yaml        
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, udf, expr, concat_ws, to_timestamp
 from pyspark.sql.types import IntegerType, DateType
@@ -44,7 +38,7 @@ def load_data():
            .getOrCreate()
     
     df = spark.read.format('jdbc') \
-        .options(driver='org.sqlite.JDBC', query=select_columns_query, url=f"jdbc:sqlite:{os.getcwd()}/FPA_FOD_20170508.sqlite") \
+        .options(driver='org.sqlite.JDBC', query=select_columns_query, url=f"jdbc:sqlite:data/FPA_FOD_20170508.sqlite") \
         .load()
     return df
 
@@ -93,7 +87,7 @@ def download_dataset():
     dataset_path = 'rtatman/188-million-us-wildfires/2'
 
     # Define the path where you want to download the dataset
-    download_path = download_path = os.getcwd()
+    download_path = './data'
     
     # Check if a key dataset file already exists to avoid re-downloading
     key_file_path = os.path.join(download_path, 'FPA_FOD_20170508.sqlite')
