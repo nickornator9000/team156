@@ -2,15 +2,11 @@
 import modelData
 from build.scripts.configSingleton import SingletonClass
 from pyspark.ml.evaluation import ClusteringEvaluator
-from pyspark.sql import SparkSession,dataframe
+from pyspark.sql import SparkSession,DataFrame
 from processData import clean_data,download_dataset
-from yaml import safe_load
-import sys
-def load_data()->dataframe:
-    with open('config/config.yaml', 'r') as file:
-        data = safe_load(file)
-        
-    select_columns_query = f"(SELECT {', '.join(data['colNames'])} FROM Fires) AS subquery"
+
+def load_data(columns:list)->DataFrame:
+    select_columns_query = f"(SELECT {', '.join(columns)} FROM Fires) AS subquery"
     
     spark = SparkSession.builder \
            .config('spark.jars.packages', 'org.xerial:sqlite-jdbc:3.34.0')\
@@ -22,15 +18,18 @@ def load_data()->dataframe:
     return df
 
 if __name__ == "__main__":
-    #do stuff
+    #pull dataset if not already present
     download_dataset()
-    df = clean_data(load_data())
+    #get configurations needed
+    getconfigs = SingletonClass.getConfig()
+    startdate = getconfigs['startdate']
+    enddate = getconfigs['enddate']
+    df = clean_data(load_data(getconfigs['colNames']))
     df = df.orderBy("DISCOVERY_DATE_TIME",ascending=False)
     df.show(3,vertical=True)
     df = df.select(['LATITUDE','LONGITUDE','OWNER_CODE','FIRE_SIZE','STAT_CAUSE_CODE','DISCOVERY_DOY'])
-    #df = df.limit(200_000)
     df = modelData.getFeatureVector(df)
-    df = modelData.runK_Means(df,k=20)
+    df = modelData.runK_Means(df,k=50)
     df.show(3)
     evaluator = ClusteringEvaluator()
     

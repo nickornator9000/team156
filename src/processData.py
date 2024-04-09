@@ -1,8 +1,7 @@
 import os
-import yaml
 from pyspark.sql.functions import col, udf, expr, concat_ws, to_timestamp
 from pyspark.sql.types import IntegerType, DateType
-from pyspark.sql import dataframe
+from pyspark.sql import DataFrame
 import datetime
 
 def julian_to_gregorian(jdn:int)->datetime.date:
@@ -26,7 +25,7 @@ def julian_to_gregorian(jdn:int)->datetime.date:
     D = int(d + 1)
     return datetime.date(Y, M, D)
 
-def clean_data(df:dataframe)->dataframe:
+def clean_data(df:DataFrame)->DataFrame:
     column_cast_dict = {
         "FOD_ID": IntegerType(), 
         "FIRE_YEAR": IntegerType(), 
@@ -51,12 +50,10 @@ def clean_data(df:dataframe)->dataframe:
     df = df.withColumn("CONT_DATE_TIME", to_timestamp(concat_ws(" ", "CONT_DATE", "CONT_TIME"), "yyyy-MM-dd HH:mm:ss"))
     return df
 
-def filter_by_yaml_timestamp(df:dataframe)->dataframe:
-    with open('config/config.yaml', 'r') as file:
-        data = yaml.safe_load(file)
-        
-    start_timestamp = datetime.datetime.fromisoformat(data['startdate'])
-    end_timestamp = datetime.datetime.fromisoformat(data['enddate'])
+def filter_by_yaml_timestamp(df:DataFrame,startdate:str,enddate:str)->DataFrame:
+    #pass dates in main class if you wish to use this feature via "getconfigs" dict
+    start_timestamp = datetime.datetime.fromisoformat(startdate)
+    end_timestamp = datetime.datetime.fromisoformat(enddate)
     filtered_df = df.filter(
         (col("DISCOVERY_DATE_TIME") >= start_timestamp) & 
         (col("DISCOVERY_DATE_TIME") <= end_timestamp)

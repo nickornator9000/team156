@@ -10,6 +10,7 @@ class SingletonClass(object):
     return cls.instance
   
   @staticmethod
-  def getConfig():
-    #need to pass in path access
-    pass
+  def getConfig()->dict:
+    with open('config/config.yaml', 'r') as file:
+        data = yaml.safe_load(file)
+    return data
