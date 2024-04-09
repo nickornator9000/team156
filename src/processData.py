@@ -4,7 +4,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, udf, expr, concat_ws, to_timestamp
 from pyspark.sql.types import IntegerType, DateType
 import datetime
-import kaggle
+
 
 def julian_to_gregorian(jdn):
     if jdn is None:
@@ -83,6 +83,7 @@ def filter_by_yaml_timestamp(df):
     return filter_by_timestamp(df, start_timestamp, end_timestamp)
 
 def download_dataset():
+    import kaggle
     # Define the dataset path on Kaggle
     dataset_path = 'rtatman/188-million-us-wildfires/2'
 
@@ -102,6 +103,6 @@ def download_dataset():
     kaggle.api.dataset_download_files(dataset_path, path=download_path, unzip=True)
     print("Dataset downloaded successfully.")
 
-download_dataset()
-df = clean_data(load_data())
-df.show(n=3, vertical=True)
+#download_dataset()
+#df = clean_data(load_data())
+#df.show(n=3, vertical=True)
