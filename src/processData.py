@@ -67,7 +67,7 @@ def filter_by_yaml_timestamp(df):
     return filter_by_timestamp(df, start_timestamp, end_timestamp)
 
 def download_dataset():
-    import kaggle
+    
     # Define the dataset path on Kaggle
     dataset_path = 'rtatman/188-million-us-wildfires/2'
 
@@ -79,13 +79,14 @@ def download_dataset():
     if os.path.exists(key_file_path):
         print(f"Dataset already exists at {key_file_path}. Skipping download.")
         return
+    else:
+        # Make sure the download path exists
+        import kaggle
+        os.makedirs(download_path, exist_ok=True)
 
-    # Make sure the download path exists
-    os.makedirs(download_path, exist_ok=True)
-
-    # Use the Kaggle API to download the dataset
-    kaggle.api.dataset_download_files(dataset_path, path=download_path, unzip=True)
-    print("Dataset downloaded successfully.")
+        # Use the Kaggle API to download the dataset
+        kaggle.api.dataset_download_files(dataset_path, path=download_path, unzip=True)
+        print("Dataset downloaded successfully.")
 
 #download_dataset()
 #df = clean_data(load_data())

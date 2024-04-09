@@ -4,9 +4,9 @@ from build.scripts.configSingleton import SingletonClass
 from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.sql import SparkSession
 from pyspark.sql import SparkSession
-from processData import clean_data
+from processData import clean_data,download_dataset
 from yaml import safe_load
-
+import sys
 def load_data():
     with open('config/config.yaml', 'r') as file:
         data = safe_load(file)
@@ -24,7 +24,7 @@ def load_data():
 
 if __name__ == "__main__":
     #do stuff
-    print("Hello world")
+    download_dataset()
     df = clean_data(load_data())
     df = df.orderBy("DISCOVERY_DATE_TIME",ascending=False)
     df.show(3,vertical=True)
