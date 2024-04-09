@@ -2,10 +2,10 @@ import os
 import yaml
 from pyspark.sql.functions import col, udf, expr, concat_ws, to_timestamp
 from pyspark.sql.types import IntegerType, DateType
+from pyspark.sql import dataframe
 import datetime
 
-
-def julian_to_gregorian(jdn):
+def julian_to_gregorian(jdn:int)->datetime.date:
     if jdn is None:
         return None
     J = float(jdn) + 0.5
@@ -26,7 +26,7 @@ def julian_to_gregorian(jdn):
     D = int(d + 1)
     return datetime.date(Y, M, D)
 
-def clean_data(df):
+def clean_data(df:dataframe)->dataframe:
     column_cast_dict = {
         "FOD_ID": IntegerType(), 
         "FIRE_YEAR": IntegerType(), 
@@ -51,22 +51,19 @@ def clean_data(df):
     df = df.withColumn("CONT_DATE_TIME", to_timestamp(concat_ws(" ", "CONT_DATE", "CONT_TIME"), "yyyy-MM-dd HH:mm:ss"))
     return df
 
-def filter_by_timestamp(df, start_timestamp, end_timestamp):
+def filter_by_yaml_timestamp(df:dataframe)->dataframe:
+    with open('config/config.yaml', 'r') as file:
+        data = yaml.safe_load(file)
+        
+    start_timestamp = datetime.datetime.fromisoformat(data['startdate'])
+    end_timestamp = datetime.datetime.fromisoformat(data['enddate'])
     filtered_df = df.filter(
         (col("DISCOVERY_DATE_TIME") >= start_timestamp) & 
         (col("DISCOVERY_DATE_TIME") <= end_timestamp)
     )
     return filtered_df
 
-def filter_by_yaml_timestamp(df):
-    with open('config/config.yaml', 'r') as file:
-        data = yaml.safe_load(file)
-        
-    start_timestamp = datetime.datetime.fromisoformat(data['startdate'])
-    end_timestamp = datetime.datetime.fromisoformat(data['enddate'])
-    return filter_by_timestamp(df, start_timestamp, end_timestamp)
-
-def download_dataset():
+def download_dataset()->None:
     
     # Define the dataset path on Kaggle
     dataset_path = 'rtatman/188-million-us-wildfires/2'
@@ -87,7 +84,4 @@ def download_dataset():
         # Use the Kaggle API to download the dataset
         kaggle.api.dataset_download_files(dataset_path, path=download_path, unzip=True)
         print("Dataset downloaded successfully.")
-
-#download_dataset()
-#df = clean_data(load_data())
-#df.show(n=3, vertical=True)
+        return

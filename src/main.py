@@ -2,12 +2,11 @@
 import modelData
 from build.scripts.configSingleton import SingletonClass
 from pyspark.ml.evaluation import ClusteringEvaluator
-from pyspark.sql import SparkSession
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession,dataframe
 from processData import clean_data,download_dataset
 from yaml import safe_load
 import sys
-def load_data():
+def load_data()->dataframe:
     with open('config/config.yaml', 'r') as file:
         data = safe_load(file)
         
