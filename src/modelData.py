@@ -13,7 +13,7 @@ to keep everything lightweight.
 Interaction/orchestration between all of these functions and processData.py will 
 be handled in main.py
 """
-def getFeatureVector(data:DataFrame):
+def getFeatureVector(data:DataFrame)->DataFrame:
     """
     In = data from processData.py, Out = feature vector
     """
@@ -21,7 +21,7 @@ def getFeatureVector(data:DataFrame):
     cleanedData = featureVector.transform(data)
     return cleanedData
 
-def runK_Means(cleanedData:DataFrame,k:int):
+def runK_Means(cleanedData:DataFrame,k:int)->DataFrame:
     """
     In = feature vector, Out = k-means model
     PARAMS = k ~ number of clusters, cleanedData ~ feature vector
@@ -32,14 +32,14 @@ def runK_Means(cleanedData:DataFrame,k:int):
     output = k_means_model.transform(cleanedData)
     return output
 
-def dimensionalityReduction(cleanedData:DataFrame,k:int):
+def dimensionalityReduction(cleanedData:DataFrame,k:int)->DataFrame:
     """
     In = feature vector, Out = Principal components based on k
     PARAMS = k ~ reduced number of features, cleanedData ~ feature vector
     this can be used to reduce the number of features for k-means,
     but note that k-means needs to be ran again after this for comparison.
     """
-    pca_reduction = PCA(k=k,inputCol="features").setOutPutCol("reduced_features")
+    pca_reduction = PCA(k=k,inputCol="features",outputCol="reduced_features")
     pca_model = pca_reduction.fit(cleanedData)
     output = pca_model.transform(cleanedData)
     return output
