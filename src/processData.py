@@ -1,6 +1,5 @@
 import os
-import yaml        
-from pyspark.sql import SparkSession
+import yaml
 from pyspark.sql.functions import col, udf, expr, concat_ws, to_timestamp
 from pyspark.sql.types import IntegerType, DateType
 import datetime
@@ -26,21 +25,6 @@ def julian_to_gregorian(jdn):
     M = int((m + 2) % 12 + 1)
     D = int(d + 1)
     return datetime.date(Y, M, D)
-
-def load_data():
-    with open('config/config.yaml', 'r') as file:
-        data = yaml.safe_load(file)
-        
-    select_columns_query = f"(SELECT {', '.join(data['colNames'])} FROM Fires) AS subquery"
-    
-    spark = SparkSession.builder \
-           .config('spark.jars.packages', 'org.xerial:sqlite-jdbc:3.34.0') \
-           .getOrCreate()
-    
-    df = spark.read.format('jdbc') \
-        .options(driver='org.sqlite.JDBC', query=select_columns_query, url="jdbc:sqlite:data/FPA_FOD_20170508.sqlite") \
-        .load()
-    return df
 
 def clean_data(df):
     column_cast_dict = {
