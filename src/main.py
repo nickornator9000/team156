@@ -18,8 +18,6 @@ def load_data(columns:list)->DataFrame:
     return df
 
 if __name__ == "__main__":
-    #pull dataset if not already present
-    download_dataset()
     #get configurations needed
     getconfigs = SingletonClass.getConfig()
     startdate = getconfigs['startdate']
