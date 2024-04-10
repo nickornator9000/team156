@@ -3,7 +3,7 @@ import modelData
 from build.scripts.configSingleton import SingletonClass
 from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.sql import SparkSession,DataFrame
-from processData import clean_data,download_dataset
+from processData import clean_data
 
 def load_data(columns:list)->DataFrame:
     select_columns_query = f"(SELECT {', '.join(columns)} FROM Fires) AS subquery"
