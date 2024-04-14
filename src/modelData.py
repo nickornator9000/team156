@@ -1,5 +1,5 @@
 #file to implement k-means & PCA
-from pyspark.ml.feature import VectorAssembler, PCA
+from pyspark.ml.feature import VectorAssembler, PCA,StandardScaler
 from pyspark.ml.clustering import KMeans
 from pyspark.sql import DataFrame
 """
@@ -21,13 +21,19 @@ def getFeatureVector(data:DataFrame)->DataFrame:
     cleanedData = featureVector.transform(data)
     return cleanedData
 
-def runK_Means(cleanedData:DataFrame,k:int)->DataFrame:
+def scaleFeatureVector(cleanedData:DataFrame):
+    scaler = StandardScaler(inputCol="features", outputCol="scaled_features", withMean=True, withStd=True)
+    scaler_fit = scaler.fit(cleanedData)
+    cleanedData = scaler_fit.transform(cleanedData)
+    return cleanedData
+
+def runK_Means(cleanedData:DataFrame,featureCol:str,k:int)->DataFrame:
     """
     In = feature vector, Out = k-means model
     PARAMS = k ~ number of clusters, cleanedData ~ feature vector
     Run k-means on dataset. 
     """
-    k_means = KMeans(k=k).setMaxIter(10).setSeed(1)
+    k_means = KMeans(k=k,featuresCol=featureCol).setMaxIter(10).setSeed(1)
     k_means_model = k_means.fit(cleanedData)
     output = k_means_model.transform(cleanedData)
     return output
