@@ -29,24 +29,6 @@ if __name__ == "__main__":
     df = df.orderBy("DISCOVERY_DATE_TIME",ascending=False)
     df.show(3,vertical=True)
     df = df.select(['LATITUDE','LONGITUDE','OWNER_CODE','FIRE_SIZE','STAT_CAUSE_CODE','DISCOVERY_DOY'])
-    
-    
-    """
-    df = modelData.getFeatureVector(df)
-    #df = modelData.scaleFeatureVector(df)
-    df = modelData.runK_Means(df,featureCol="features",k=k)
-    df.show(3)
-    evaluator = ClusteringEvaluator()
-    
-    eval = evaluator.evaluate(df)
-    
-    print(str(eval))
-    df = df.select(['LATITUDE','LONGITUDE','OWNER_CODE','FIRE_SIZE','STAT_CAUSE_CODE','DISCOVERY_DOY','prediction'])
-    df = df.coalesce(1)
-    df.write.csv("prototype_data.csv", header=True, mode="overwrite")
-    df = df.groupBy("prediction").count()
-    df.show(k)
-    """
     df = df.withColumn("id",monotonically_increasing_id())
     tmp_df = df.select(['OWNER_CODE','FIRE_SIZE','STAT_CAUSE_CODE','DISCOVERY_DOY'])
     pca_features = modelData.getFeatureVector(tmp_df)
