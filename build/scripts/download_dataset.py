@@ -1,4 +1,6 @@
 import os
+import sys
+
 def download_dataset()->None:
     
     # Define the dataset path on Kaggle
@@ -26,5 +28,19 @@ def getUserLogin():
     #function to pass user login to env for kaggle api
     pass
 
-if __name__ == '__main__':
-    print("hello world")
+if len(sys.argv) != 3:
+    print("Error: your kaggle username and key are required.")
+    print("Usage: python build/scripts/download_dataset.py your_kaggle_username your_kaggle_key")
+    sys.exit(1)
+        
+kaggle_username = sys.argv[1]
+kaggle_key = sys.argv[2]
+
+print("Setting Kaggle account credentials")
+print(f"Username: {kaggle_username}")
+print(f"Key: {kaggle_key}")
+
+os.environ['KAGGLE_USERNAME'] = sys.argv[1]
+os.environ['KAGGLE_KEY'] = sys.argv[2]
+
+download_dataset()
