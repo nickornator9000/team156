@@ -6,7 +6,6 @@ kaggle==1.6.11
 numpy==1.26.4
 py4j==0.10.9
 pyspark==3.0.3
-pyspark-stubs==3.0.0.post3
 python-dateutil==2.9.0.post0
 python-slugify==8.0.4
 PyYAML==6.0.1
