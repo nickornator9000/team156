@@ -13,6 +13,9 @@ The repository is using PySpark for data transformations and modelling. The two 
 
 The repository is containerized and should be deployed with docker. 
 
+Get dataset: The first step is to pull the ".sqlite" dataset from kaggle this can be done by pulling it manually from Kaggle or 
+by using the provided script in /build/scripts/download_dataset.py
+
 Build = docker build -t imagename:imagetag .  
 
 Run = docker run -it -v /local/path/to/data/folder:/app/data imageName
