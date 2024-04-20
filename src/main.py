@@ -36,7 +36,7 @@ def main(argv):
          k = arg
       elif opt in ("-p"):
          p = arg
-   return [k,p]
+   return [int(k),int(p)]
 
 if __name__ == "__main__":
     #get configurations needed
