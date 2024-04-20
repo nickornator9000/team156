@@ -5,9 +5,7 @@ from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.sql import SparkSession,DataFrame
 from pyspark.ml.feature import StandardScaler
 from processData import clean_data
-import os
-import sys
-
+import os,sys,getopt
 def load_data(columns:list)->DataFrame:
     select_columns_query = f"(SELECT {', '.join(columns)} FROM Fires) AS subquery"
     
@@ -21,22 +19,46 @@ def load_data(columns:list)->DataFrame:
         .load()
     return df
 
+def main(argv):
+   k = 20
+   p = 3
+   try:
+      opts, args = getopt.getopt(argv,"hk:p:")
+   except getopt.GetoptError:
+      print ('src/main.py -k <# of Clusters> -p <# of dimensions>')
+      return [k,p]
+   for opt, arg in opts:
+      if opt == '-h':
+         print("USAGE: ")
+         print ('\nsrc/main.py -k <# of Clusters> -p <# of dimensions>')
+         sys.exit()
+      elif opt in ("-k"):
+         k = arg
+      elif opt in ("-p"):
+         p = arg
+   return [k,p]
+
 if __name__ == "__main__":
     #get configurations needed
     getconfigs = SingletonClass.getConfig()
-    k=20
+    getUserArgs = main(sys.argv[1:])
+    k=getUserArgs[0]
+    p=getUserArgs[1]
+    print(f"Number of Clusters: {k}")
+    print(f"Number of dimensions: {p}")
     startdate = getconfigs['startdate']
     enddate = getconfigs['enddate']
     os.environ['PYSPARK_PYTHON'] = sys.executable
     os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
     df = clean_data(load_data(getconfigs['colNames']))
     df = df.orderBy("DISCOVERY_DATE_TIME",ascending=False)
+
+    #Enter columns to be used by model
     df = df.select(['LATITUDE','LONGITUDE','OWNER_CODE','FIRE_SIZE','STAT_CAUSE_CODE','DISCOVERY_DOY'])
 
     df = modelData.getFeatureVector(df)
-    #df = modelData.scaleFeatureVector(df)
-    df = modelData.dimensionalityReduction(df,3,inputCol='features')
-    #df = modelData.getFeatureVector(df,inputCols=['LATITUDE','LONGITUDE','reduced_features'],outputCol="final_features")
+    
+    df = modelData.dimensionalityReduction(df,p,inputCol='features')
     df = modelData.runK_Means(cleanedData=df,featureCol='reduced_features',k=k)
     df.show(10)
 

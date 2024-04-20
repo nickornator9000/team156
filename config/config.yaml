@@ -40,6 +40,6 @@ colNames:
 - FIPS_CODE
 - FIPS_NAME
 
-#some way to limit range based on datetime
+#limit range based on datetime
 startdate: "YYYY-MM-DD HH:MM:SS"
 enddate: "YYYY-MM-DD HH:MM:SS"
