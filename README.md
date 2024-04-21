@@ -17,6 +17,10 @@ Get dataset: The first step is to pull the ".sqlite" dataset from kaggle this ca
 by using the provided script in /build/scripts/download_dataset.py:  
 (local) python build/scripts/download_dataset.py your_kaggle_username your_kaggle_key
 
+Note:  
+Depending on your computers chipset you may need to change the JAVA_HOME env variable in the Dockerfile to amd64  
+Ensure that you download the .sqlite dataset to the /data folder in the repository
+
 Build = docker build -t imagename:imagetag .  
 
 Run = docker run -it -v /local/path/to/data/folder:/app/data imageName
