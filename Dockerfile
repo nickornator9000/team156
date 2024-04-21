@@ -7,4 +7,5 @@ COPY . /app
 
 RUN pip install -r dep/requirements.txt
 ENV PYTHONPATH="$PYTHONPATH:/app:/app/build:/app/build/scripts:/app/src"
-ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-arm64"
+RUN chmod +x build/scripts/java_home.sh
+ENTRYPOINT ["build/scripts/java_home.sh"]
