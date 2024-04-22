@@ -23,7 +23,7 @@ Ensure that you download the .sqlite dataset to the /data folder in the reposito
 
 Build = docker build -t imagename:imagetag .  
 
-Run = docker run -it -v /local/path/to/data/folder:/app/data imageName
+Run = docker run -it -v /local/path/to/data/folder:/app/data imageName /bin/bash
 
 Run application = python3 src/main.py -k <# of clusters> -p <# of dimensions>
 
